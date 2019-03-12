@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
@@ -83,10 +84,15 @@ public class FFrom<T,R> {
 		return this.where;
 	}
 
+	@SuppressWarnings("unchecked")
 	private Predicate generatePredicate() {
 		
 		if (this.fields!=null && !this.fields.isEmpty()) {
-			this.query.multiselect(this.fields.getFields());
+			if (this.fields.size()==1) {
+				this.query.select((Selection<? extends R>)this.fields.getFields().get(0));
+			} else {
+				this.query.multiselect(this.fields.getFields());
+			}
 		}
 		
 		if (!this.order.isEmpty()) {
@@ -220,8 +226,16 @@ public class FFrom<T,R> {
 			this.query.where(predicate);
 		}
 		
-		R result = this.em.createQuery(this.query).getSingleResult();
-		return result;
+		try {
+			
+			R result = this.em.createQuery(this.query).getSingleResult();
+			return result;
+			
+		} catch (NoResultException e) {
+			
+			return null;
+			
+		}
 		
 	}
 	
