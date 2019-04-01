@@ -178,12 +178,18 @@ public class PredicateContainer<T, D, V, F1, F2> {
 	}
 	
 	public <A> PredicateContainer<T, D, V, F1, F2> in(SingularAttribute<D, A> field, A ...values) {
-		add(f(field).in(values));
+		if (this.isCan) {
+			add(f(field).in(values));
+		}
+		this.isCan = true;
 		return this;
 	}
 	
 	public <A> PredicateContainer<T, D, V, F1, F2> in(SingularAttribute<D, A> field, Collection<A> values) {
-		add(f(field).in(values));
+		if (this.isCan) {
+			add(f(field).in(values));
+		}
+		this.isCan = true;
 		return this;
 	}
 	
